@@ -10,7 +10,7 @@ class Settings:
     
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
-        "postgresql://postgres:postgres@localhost:5432/miprestamo"
+        "postgresql://postgres:postgres@localhost:5432/meloan_db"
     )
     
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")

@@ -3,11 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import create_tables
+from app.routes.loans import loans_router
 
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="Sistema de gestión de préstamos con precisión bancaria",
+    description="API for managing personal loans.",
     docs_url="/docs",
     redoc_url="/redoc"
 )
@@ -22,15 +23,16 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    print(f"🚀 Iniciando {settings.APP_NAME} v{settings.APP_VERSION}")
+    print(f"🚀 Starting {settings.APP_NAME} v{settings.APP_VERSION}")
     if settings.DEBUG:
-        print("📊 Creando tablas de BD...")
+        print("📊 Creating DB tables...")
         create_tables()
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    print("👋 Cerrando aplicación")
+    print("👋 Closing application")
 
+app.include_router(loans_router)
 
 @app.get("/", tags=["root"])
 async def root():
@@ -48,7 +50,7 @@ async def health_check():
 @app.get("/api/test", tags=["test"])
 async def test():
     return {
-        "message": "API funcionando correctamente",
+        "message": "API working correctly",
         "endpoints": {
             "loans": "/api/loans",
             "docs": "/docs"
