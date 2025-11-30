@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
 from app.database import create_tables
-from app.routes.loans import loans_router
+from app.routes.loans import router as loans_router
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -23,7 +23,7 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    print(f"🚀 Starting {settings.APP_NAME} v{settings.APP_VERSION}")
+    print(f"🚀 Starting {settings.APP_NAME} v{settings.APP_VERSION} in port: 8000")
     if settings.DEBUG:
         print("📊 Creating DB tables...")
         create_tables()

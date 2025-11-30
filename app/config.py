@@ -4,13 +4,12 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Settings:
-    APP_NAME: str = "MiPréstamo"
+    APP_NAME: str = "MeLoan API"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = os.getenv("DEBUG", "False").lower() == "true"
     
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
-        "postgresql://postgres:postgres@localhost:5432/meloan_db"
     )
     
     SECRET_KEY: str = os.getenv("SECRET_KEY", "dev-secret-key-change-in-production")
