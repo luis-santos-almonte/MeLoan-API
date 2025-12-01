@@ -1,3 +1,3 @@
 from app.models.loan import Loan
 
-__all__ = ["Loan"]
+__all__ = ["Loan", "AmortizationSchedule"]
