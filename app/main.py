@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
 from app.database import create_tables
 from app.routes.loans import router as loans_router
+from app.routes.amortization import router as amortization_router
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -33,6 +34,7 @@ async def shutdown_event():
     print("👋 Closing application")
 
 app.include_router(loans_router)
+app.include_router(amortization_router)
 
 @app.get("/", tags=["root"])
 async def root():
