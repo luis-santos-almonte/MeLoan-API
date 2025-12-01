@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Date, Numeric, String, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, Date, Numeric, String, DateTime, Boolean, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.database import Base
@@ -17,10 +17,13 @@ class AmortizationSchedule(Base):
     scheduled_payment = Column(Numeric(19, 2), nullable=False)
     scheduled_principal = Column(Numeric(19, 2), nullable=False)
     scheduled_interest = Column(Numeric(19, 2), nullable=False)
+    insurance_amount = Column(Numeric(19, 2), default=0, nullable=False)
     
     remaining_balance = Column(Numeric(19, 2), nullable=False)
     
     status = Column(String(50), default="pending", nullable=False)
+    
+    is_grace_period = Column(Boolean, default=False, nullable=False)
     
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
@@ -42,16 +45,13 @@ class AmortizationSchedule(Base):
             return 0
         return (date_type.today() - self.due_date).days
     
-    @property
-    def accrued_interest_to_date(self) -> Decimal:
-        from datetime import date as date_type
-        
-        if self.status == "paid":
-            return Decimal(str(self.scheduled_interest))
-        
-        today = date_type.today()
-        
-        if today < self.due_date:
+    def calculate_penalty(self, penalty_rate: Decimal) -> Decimal:
+        if not self.is_overdue or penalty_rate == 0:
             return Decimal("0")
         
-        return Decimal(str(self.scheduled_interest))
+        from app.services.calculation_service import CalculationService
+        return CalculationService.calculate_late_payment_penalty(
+            Decimal(str(self.scheduled_payment)),
+            self.days_overdue,
+            penalty_rate
+        )
