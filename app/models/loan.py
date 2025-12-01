@@ -22,7 +22,7 @@ class Loan(Base):
     start_date = Column(Date, nullable=True)
     payment_day = Column(Integer, default=1, nullable=False)
     payment_frequency = Column(String(50), default="monthly", nullable=False)
-    organization_fee = Column(Numeric(19, 2), default=0, nullable=False)
+    origination_fee = Column(Numeric(19, 2), default=0, nullable=False)
     insurance_monthly = Column(Numeric(19, 2), default=0, nullable=False)
     
     rate_type = Column(String(50), default="fixed", nullable=False) 

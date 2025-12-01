@@ -13,7 +13,16 @@ async def create_loan(loan_data: LoanCreate, current_user = Depends(get_current_
     try:
         return service.create_loan(loan_data, user_id=current_user.id)
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Error al crear préstamo: {str(e)}")
+        import traceback
+        error_detail = traceback.format_exc()
+        print("=" * 80)
+        print("ERROR COMPLETO:")
+        print(error_detail)
+        print("=" * 80)
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail=f"Error al crear préstamo: {str(e)}\n\nTraceback:\n{error_detail}"
+        )
 
 @router.get("/", response_model=LoanListResponse)
 async def get_loans(skip: int = Query(0, ge=0), limit: int = Query(100, ge=1, le=500), 
@@ -35,8 +44,7 @@ async def get_loan(loan_id: int, current_user = Depends(get_current_user), db: S
     return loan
 
 @router.patch("/{loan_id}", response_model=LoanResponse)
-async def update_loan(loan_id: int, loan_data: LoanUpdate, current_user = Depends(get_current_user), 
-                      db: Session = Depends(get_db)) -> LoanResponse:
+async def update_loan(loan_id: int, loan_data: LoanUpdate, current_user = Depends(get_current_user), db: Session = Depends(get_db)) -> LoanResponse:
     service = get_loan_service(db)
     updated_loan = service.update_loan(loan_id, loan_data, user_id=current_user.id)
     if not updated_loan:

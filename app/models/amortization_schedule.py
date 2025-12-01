@@ -28,7 +28,7 @@ class AmortizationSchedule(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     
     loan = relationship("Loan", back_populates="amortization_schedule")
-    payments = relationship("Payment", back_populates="payment_schedule")
+    # payments = relationship("Payment", back_populates="payment_schedule")
     
     def __repr__(self):
         return f"<AmortizationSchedule(loan_id={self.loan_id}, #={self.payment_number}, status={self.status})>"
