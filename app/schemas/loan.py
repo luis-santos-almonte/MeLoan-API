@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 from typing import Optional
-from datetime import datetime
+from datetime import date, datetime
 from decimal import Decimal
 
 class LoanBase(BaseModel):
@@ -11,6 +11,7 @@ class LoanBase(BaseModel):
     principal: Decimal = Field(..., gt=0)
     annual_rate: Decimal = Field(..., gt=0, le=100)
     months: int = Field(..., gt=0, le=600)
+    start_date: Optional[date] = None
     
     @field_validator("type")
     @classmethod
@@ -72,6 +73,7 @@ class LoanResponse(LoanBase):
     id: int
     user_id: int
     status: str
+    start_date: Optional[date] = None
     is_deleted: bool
     deleted_at: Optional[datetime] = None
     created_at: datetime
@@ -94,6 +96,7 @@ class LoanSummary(BaseModel):
     principal: Decimal
     annual_rate: Decimal
     months: int
+    start_date: Optional[date] = None
     monthly_payment: Optional[Decimal] = None
     created_at: datetime
     is_deleted: bool
