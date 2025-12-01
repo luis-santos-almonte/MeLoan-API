@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, computed_field
 from datetime import date
 from decimal import Decimal
 
@@ -14,11 +14,35 @@ class AmortizationScheduleBase(BaseModel):
 class AmortizationScheduleResponse(AmortizationScheduleBase):
     id: int
     loan_id: int
-    is_overdue: bool
-    days_overdue: int
-    accrued_interest_to_date: Decimal
     
     model_config = ConfigDict(from_attributes=True)
+    
+    @computed_field
+    @property
+    def is_overdue(self) -> bool:
+        if self.status in ["paid", "cancelled"]:
+            return False
+        return self.due_date < date.today()
+    
+    @computed_field
+    @property
+    def days_overdue(self) -> int:
+        if not self.is_overdue:
+            return 0
+        return (date.today() - self.due_date).days
+    
+    @computed_field
+    @property
+    def accrued_interest_to_date(self) -> Decimal:
+        if self.status == "paid":
+            return self.scheduled_interest
+        
+        today = date.today()
+        
+        if today < self.due_date:
+            return Decimal("0")
+        
+        return self.scheduled_interest
 
 class AmortizationScheduleListResponse(BaseModel):
     items: list[AmortizationScheduleResponse]
