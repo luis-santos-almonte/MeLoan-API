@@ -12,6 +12,10 @@ class LoanBase(BaseModel):
     annual_rate: Decimal = Field(..., gt=0, le=100)
     months: int = Field(..., gt=0, le=600)
     start_date: Optional[date] = None
+    payment_day: int = Field(default=1, ge=1, le=31)
+    payment_frequency: str = Field(default="monthly")
+    organization_fee: Decimal = Field(default=Decimal("0"), ge=0)
+    insurance_monthly: Decimal = Field(default=Decimal("0"), ge=0)
     
     @field_validator("type")
     @classmethod
@@ -50,6 +54,11 @@ class LoanUpdate(BaseModel):
     principal: Optional[Decimal] = Field(None, gt=0)
     annual_rate: Optional[Decimal] = Field(None, gt=0, le=100)
     months: Optional[int] = Field(None, gt=0, le=600)
+    start_date: Optional[date] = None
+    payment_day: Optional[int] = Field(None, ge=1, le=31)
+    payment_frequency: Optional[str] = None
+    organization_fee: Optional[Decimal] = Field(None, ge=0)
+    insurance_monthly: Optional[Decimal] = Field(None, ge=0)
     
     @field_validator("type")
     @classmethod
@@ -67,6 +76,14 @@ class LoanUpdate(BaseModel):
             allowed = ["simulation", "active", "paid_off", "cancelled"]
             if v not in allowed:
                 raise ValueError(f"Status must be one of: {allowed}")
+        return v
+    @field_validator("payment_frequency")
+    @classmethod
+    def validate_payment_frequency(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None:
+            allowed = ["monthly", "biweekly", "weekly"]
+            if v not in allowed:
+                raise ValueError(f"Payment frequency must be one of: {allowed}")
         return v
 
 class LoanResponse(LoanBase):
